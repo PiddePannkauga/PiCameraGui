@@ -2,7 +2,7 @@ from Tkinter import *
 from picamera import PiCamera
 
 redAWB = 1.44
-blueAWB = 0.88
+blueAWB = 0.84
 AWBsliderRes = 0.01
 sharpsliderRes = 1
 gains = (redAWB,blueAWB)
@@ -12,7 +12,9 @@ camera.awb_gains = gains
 #camera.exposure_mode = 'off'
 camera.vflip = True
 camera.hflip = True
-#camera.shutter_speed = camera.exposure_speed
+camera.resolution = (800, 600)
+camera.framerate = 15
+camera.shutter_speed = camera.exposure_speed
 #camera.drc_strength = "high"
 
 
@@ -32,7 +34,7 @@ def setBlue(blue):
     camera.awb_gains = gains
    
 def takePicture():
-    camera.capture("testAWB.jpg")
+    camera.capture("testAWB.jpg", )
 
 def takeYuvPicture():
     camera.capture("testAWB.data", "yuv")
@@ -47,15 +49,25 @@ def setISO(val):
 def repos(val):
     previewX = master.winfo_x()
     previewY = master.winfo_y()    
-    camera.start_preview(fullscreen=False,resolution=(1920,1080),window=(previewX+75,previewY+250,800,600))    
+    camera.start_preview(fullscreen=False,resolution=(800,600),window=(previewX+75,previewY+350,800,600))    
 
+def exposure():
+        camera.exposure_mode=exposureMode.get().lower()
+
+def drc():
+        camera.drc_strength=drcMode.get().lower()
+
+def mode(val):
+        #flicker()
+        exposure()
+        drc()
 
 master = Tk()
 
 previewX = master.winfo_x()
 previewY = master.winfo_y()
 
-camera.start_preview(fullscreen=False,window=(previewX+75,previewY+250,800,600))
+camera.start_preview(fullscreen=False,window=(previewX+75,previewY+350,800,600))
 redSlider = Scale(master,label="RedAWB",resolution=AWBsliderRes,orient=HORIZONTAL, from_=0.0, to=5.0, command=setRed)
 redSlider.pack()
 
@@ -68,7 +80,17 @@ isoSlider.pack()
 sharpnessSlider = Scale(master,label="Sharpness", orient=HORIZONTAL,resolution=sharpsliderRes, from_=-100, to=100, command=setSharpness)
 sharpnessSlider.pack()
 
-frame = Frame (master,height=600, width=860)
+Label(master,text="Exposure Mode").pack()
+
+exposureMode = Entry(master)
+exposureMode.pack()
+
+Label(master,text="DRC Mode").pack()
+drcMode = Entry(master)
+drcMode.pack()
+
+
+frame = Frame (master,height=600, width=900)
 frame.pack()
 
 btn = Button(master, text="Take Picture", command = takePicture)
@@ -78,4 +100,5 @@ btnYuv = Button(master, text="Take YUV Picture", command = takeYuvPicture)
 btnYuv.pack()
 
 master.bind("<Configure>", repos)
+master.bind("<Return>", mode)
 mainloop()
