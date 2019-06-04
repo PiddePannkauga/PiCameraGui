@@ -1,10 +1,10 @@
 from Tkinter import *
 from picamera import PiCamera
 
-redAWB = 1.44
-blueAWB = 0.84
+redAWB = 0.29
+blueAWB = 4.43
 AWBsliderRes = 0.01
-sharpsliderRes = 1
+brightnessSliderRes = 1
 gains = (redAWB,blueAWB)
 camera = PiCamera() 
 camera.awb_mode = 'off'
@@ -14,7 +14,7 @@ camera.vflip = True
 camera.hflip = True
 camera.resolution = (800, 600)
 camera.framerate = 15
-camera.shutter_speed = camera.exposure_speed
+#camera.shutter_speed = camera.exposure_speed
 #camera.drc_strength = "high"
 
 
@@ -39,12 +39,16 @@ def takePicture():
 def takeYuvPicture():
     camera.capture("testAWB.data", "yuv")
 
-def setSharpness(val):
-    camera.sharpness=int(val)
+def setBrightness(val):
+    camera.brightness=int(val)
     #camera.digital_gain = float(val) 
 
 def setISO(val):
     camera.iso = int(val)
+
+def setContrast(val):
+    camera.contrast = int(val)
+
 
 def repos(val):
     previewX = master.winfo_x()
@@ -77,8 +81,11 @@ blueSlider.pack()
 isoSlider = Scale(master,label="ISO",orient=HORIZONTAL,from_=0, to=800, command = setISO)
 isoSlider.pack()
 
-sharpnessSlider = Scale(master,label="Sharpness", orient=HORIZONTAL,resolution=sharpsliderRes, from_=-100, to=100, command=setSharpness)
-sharpnessSlider.pack()
+brightnessSlider = Scale(master,label="Brightness", orient=HORIZONTAL,resolution=brightnessSliderRes, from_=-100, to=100, command=setBrightness)
+brightnessSlider.pack()
+
+contrastSlider = Scale(master,label="Contrast", orient=HORIZONTAL, resolution= brightnessSliderRes, from_=-100, to=100, command=setContrast)
+contrastSlider.pack()
 
 Label(master,text="Exposure Mode").pack()
 
